@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 import os
 import logging
 
+# Suppress specific warning globally
+import warnings
+warnings.filterwarnings("ignore", message=r".*clean_up_tokenization_spaces.*", category=FutureWarning)
+
 # Load environment variables from .env file
 load_dotenv()
 
