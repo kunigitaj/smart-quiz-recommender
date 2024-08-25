@@ -6,12 +6,12 @@ import logging
 from sentence_transformers import SentenceTransformer, util
 from .utils import load_json
 from .custom_tokenize import custom_tokenize
+from . import cache  # Import the cache instance from __init__.py
 
 # Load the model globally to avoid reloading it for every request
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2').to(device)
 
-# Load and preprocess quizzes data
 def load_quizzes():
     quizzes_path = os.getenv('QUIZZES_JSON_PATH')
     if not quizzes_path:
@@ -26,7 +26,10 @@ def load_quizzes():
         logging.exception(f"Error loading quizzes from {quizzes_path}")
         raise
 
-def preprocess_quizzes(quizzes):
+@cache.memoize(timeout=3600)  # Use the cache instance correctly
+def load_and_preprocess_quizzes():
+    quizzes = load_quizzes()
+
     questions = []
     embeddings = []
     for quiz in quizzes['quizzes']:
@@ -41,12 +44,11 @@ def preprocess_quizzes(quizzes):
             # Directly encode the combined text into a tensor
             embedding = model.encode(combined_text, convert_to_tensor=True).to('cpu')
             embeddings.append(embedding)
-    
+
     return questions, torch.stack(embeddings)
 
-# Load and preprocess the quizzes when the module is imported
-quizzes = load_quizzes()
-questions, embeddings = preprocess_quizzes(quizzes)
+# Use the cached function to load and preprocess quizzes
+questions, embeddings = load_and_preprocess_quizzes()
 
 def recommend_questions(queries):
     recommendations = []
