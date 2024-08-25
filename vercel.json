@@ -1,11 +1,5 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "app/wsgi.py",
-            "use": "@vercel/python"
-        }
-    ],
     "functions": {
         "app/wsgi.py": {
             "memory": 3008,
