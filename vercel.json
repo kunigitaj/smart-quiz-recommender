@@ -1,7 +1,7 @@
 {
     "version": 2,
     "functions": {
-        "app/wsgi.py": {
+        "api/index.py": {
             "memory": 1024,
             "maxDuration": 60
         }
@@ -9,7 +9,7 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "app/wsgi.py"
+            "dest": "api/index.py"
         }
     ]
 }
