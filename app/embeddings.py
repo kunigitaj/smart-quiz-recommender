@@ -26,7 +26,7 @@ def dequantize_embeddings(quantized_embeddings, min_val, max_val):
 
 def load_precomputed_data():
     # Download precomputed embeddings from Firebase
-    precomputed_data_bytes = download_file_from_firebase('precomputed_embeddings.json')
+    precomputed_data_bytes = download_file_from_firebase('precomputed_embeddings_torch.json')
     precomputed_data = json.loads(precomputed_data_bytes.decode('utf-8'))
 
     questions = [entry['question'] for entry in precomputed_data]
