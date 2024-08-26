@@ -8,17 +8,26 @@ import logging
 from sentence_transformers import SentenceTransformer, util
 from sklearn.decomposition import PCA
 import joblib
+from io import BytesIO
+from .firebase_config import get_storage_bucket
 from . import cache
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2').to(device)
 
+def download_file_from_firebase(filename):
+    bucket = get_storage_bucket()
+    blob = bucket.blob(filename)
+    file_data = blob.download_as_bytes()
+    return file_data
+
 def dequantize_embeddings(quantized_embeddings, min_val, max_val):
     return quantized_embeddings * (max_val - min_val) / 255.0 + min_val
 
 def load_precomputed_data():
-    with open('public/precomputed_embeddings.json', 'r') as f:
-        precomputed_data = json.load(f)
+    # Download precomputed embeddings from Firebase
+    precomputed_data_bytes = download_file_from_firebase('precomputed_embeddings.json')
+    precomputed_data = json.loads(precomputed_data_bytes.decode('utf-8'))
 
     questions = [entry['question'] for entry in precomputed_data]
     quantized_embeddings = np.array([entry['embedding'] for entry in precomputed_data], dtype=np.uint8)
@@ -33,8 +42,9 @@ def load_precomputed_data():
 def get_precomputed_data():
     return load_precomputed_data()
 
-pca_model_path = 'public/pca_model.pkl'
-pca = joblib.load(pca_model_path)
+# Load PCA model from Firebase
+pca_model_bytes = download_file_from_firebase('pca_model.pkl')
+pca = joblib.load(BytesIO(pca_model_bytes))
 
 questions, embeddings = get_precomputed_data()
 

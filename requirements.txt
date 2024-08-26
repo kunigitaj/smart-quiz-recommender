@@ -6,3 +6,4 @@ numpy
 gunicorn
 scikit-learn
 joblib
+firebase-admin
