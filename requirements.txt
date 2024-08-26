@@ -2,7 +2,4 @@ flask
 flask-caching
 sentence-transformers
 torch
-numpy
-scikit-learn
-joblib
 firebase-admin
