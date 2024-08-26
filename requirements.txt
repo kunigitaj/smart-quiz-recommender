@@ -3,7 +3,6 @@ flask-caching
 sentence-transformers
 torch
 numpy
-gunicorn
 scikit-learn
 joblib
 firebase-admin
